@@ -5,6 +5,8 @@ This script does just that.
 The repo comes with built-in images samples in `std` directory. Whenever `./fetch` is called to fetch image(s), it will drop those into `gen` directory (if `--dir` options is not specified).
 So, suppose you need a 1280x1024 for testing something on your brand new cool website. Instead of googling for such an image with this script you'd do `./fetch 1280x1024` and that's it. And if you need 10 images of the same size, that's as easy as `./fetch 1280x1024:10`
 
+Note: the script is written in Python v 2.7 (since it's already installed on majority of Linux/MacOS machines by default), `urllib2` was used intentionally so that we don't require to pull down any dependencies.
+
 ### How to use
 
 Simply run
