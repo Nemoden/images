@@ -1,0 +1,108 @@
+#!/usr/bin/env python
+# TODO: Currently works only with https://placeimg.com/, add support for http://lorempixel.com/ and https://picsum.photos/
+# TODO: make a special command to fetch images based on preconfigured
+# settings
+import argparse
+import re
+import urllib2
+import os
+import glob
+
+ROOT_DIR = os.path.realpath(os.path.dirname(__file__))
+
+def write_file(basename, content, dir):
+    files = [ os.path.basename(f) for f in  glob.glob(os.path.join(ROOT_DIR, dir, '*.jpg')) ]
+    fname = basename + '.jpg'
+    i = 1
+    while fname in files:
+        fname = basename + '_' + str(i) + '.jpg'
+        i += 1
+
+    file = os.path.join(ROOT_DIR, dir, fname)
+    with open(file, 'w') as f:
+        f.write(content)
+
+    return file
+
+
+class Specification(object):
+
+    def __init__(self, spec):
+        self.categories = ['animals', 'arch', 'nature', 'people', 'tech']
+        self.filters = ['grayscale', 'sepia']
+        self.width = None
+        self.height = None
+        self.category = None
+        self.filter = None
+        self.number = 1
+        self.parse(spec)
+
+    def parse(self, spec):
+        terms = spec.split(':')
+        dimensions = terms.pop(0)
+        self.width, self.height = self.get_xy(dimensions)
+        while len(terms) > 0:
+            gizmo = terms.pop(0).lower()
+            if gizmo in self.categories:
+                self.category = gizmo
+            elif gizmo in self.filters:
+                self.filter = gizmo
+            elif gizmo.isdigit():
+                self.number = int(gizmo)
+
+    def get_xy(self, dim):
+        m = re.search('(\\d+)x(\\d+)', dim)
+        if m is None:
+            raise Exception('Dimensions MUST be in format of WIDTHxHEIGHT whereas WIDTH and HEIGHT are integer value. ' + dim + ' given as dimensions')
+        return [m.group(1), m.group(2)]
+
+    @property
+    def basename(self):
+        parts = ["%sx%s" % (self.width, self.height, )]
+        if self.category:
+            parts.append(self.category.upper())
+        if self.filter:
+            parts.append(self.filter.upper())
+        return "_".join(parts)
+
+    @staticmethod
+    def from_string(x):
+        return Specification(x)
+
+    def __repr__(self):
+        return "<%sx%s:%s:%s:%s>" % (self.width, self.height, self.category, self.filter, self.number, )
+
+    def __str__(self):
+        return "%sx%s:%s:%s:%s" % (self.width, self.height, self.category, self.filter, self.number, )
+
+
+description = """
+Fetches images from placeimg.com for testing while developing your beautiful app
+
+    Available image categories are: 'animals', 'arch', 'nature', 'people', 'tech'
+    Available image filters are:    'grayscale', 'sepia'
+
+    Specification format is: WIDTHxHEIGHT[:CATEGORY][:FILTER][:NUMBER]
+"""
+parser = argparse.ArgumentParser(description = description, formatter_class=argparse.RawDescriptionHelpFormatter)
+parser.add_argument('spec', metavar='SPECIFICATION', nargs='*', help='Specification', type=Specification.from_string)
+parser.add_argument('-d', '--dir', metavar='DIRECTORY', default='gen', help='Output directory')
+
+if __name__ == '__main__':
+
+    args = parser.parse_args()
+
+    for spec in args.spec:
+        params = [spec.width, spec.height]
+        if spec.category is not None:
+            params.append(spec.category.upper())
+        if spec.filter is not None:
+            params.append(spec.filter.upper())
+
+        for i in range(0, spec.number):
+            url = 'https://placeimg.com/%s' % ('/'.join(params))
+            req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            response = urllib2.urlopen(req)
+            image = response.read()
+            written_file = write_file(spec.basename, image, args.dir)
+            print "Written: %s" % (written_file, )
