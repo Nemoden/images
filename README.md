@@ -37,13 +37,13 @@ Whole usage is:
 
 ### Call samples
 
-    $ ./fetch 600x400:PEOPLE:SEPIA:3 100x100:TECH 1200x800:SEPIA:2
+    $ ./fetch 600x400:PEOPLE:SEPIA:3 100x100:TECH 1200x800:NATURE:2
     Written: gen/600x400_PEOPLE_SEPIA.jpg
     Written: gen/600x400_PEOPLE_SEPIA_1.jpg
     Written: gen/600x400_PEOPLE_SEPIA_2.jpg
     Written: gen/100x100_TECH.jpg
-    Written: gen/1200x800_SEPIA.jpg
-    Written: gen/1200x800_SEPIA_1.jpg
+    Written: gen/1200x800_NATURE.jpg
+    Written: gen/1200x800_NATURE_1.jpg
 
     $ ./fetch 600x400:TECH
     Written: gen/600x400_TECH.jpg
