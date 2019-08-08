@@ -93,6 +93,8 @@ parser.add_argument('-d', '--dir', metavar='DIRECTORY', default='gen', help='Out
 if __name__ == '__main__':
 
     args = parser.parse_args()
+    if len(args.spec) == 0:
+        parser.print_help()
 
     for spec in args.spec:
         params = [spec.width, spec.height]
