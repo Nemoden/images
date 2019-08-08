@@ -46,6 +46,8 @@ class Specification(object):
             if gizmo in self.categories:
                 self.category = gizmo
             elif gizmo in self.filters:
+                if self.category is None:
+                    self.category = 'any'
                 self.filter = gizmo
             elif gizmo.isdigit():
                 self.number = int(gizmo)
@@ -59,7 +61,7 @@ class Specification(object):
     @property
     def basename(self):
         parts = ["%sx%s" % (self.width, self.height, )]
-        if self.category:
+        if self.category and self.category.lower() != 'any':
             parts.append(self.category.upper())
         if self.filter:
             parts.append(self.filter.upper())
@@ -95,9 +97,9 @@ if __name__ == '__main__':
     for spec in args.spec:
         params = [spec.width, spec.height]
         if spec.category is not None:
-            params.append(spec.category.upper())
+            params.append(spec.category.lower())
         if spec.filter is not None:
-            params.append(spec.filter.upper())
+            params.append(spec.filter.lower())
 
         for i in range(0, spec.number):
             url = 'https://placeimg.com/%s' % ('/'.join(params))
