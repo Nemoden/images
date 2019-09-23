@@ -9,6 +9,7 @@ import os
 import glob
 
 ROOT_DIR = os.path.realpath(os.path.dirname(__file__))
+BASE_URL = 'https://placeimg.com/'
 
 def write_file(basename, content, dir):
     files = [ os.path.basename(f) for f in  glob.glob(os.path.join(ROOT_DIR, dir, '*.jpg')) ]
@@ -104,7 +105,7 @@ if __name__ == '__main__':
             params.append(spec.filter.lower())
 
         for i in range(0, spec.number):
-            url = 'https://placeimg.com/%s' % ('/'.join(params))
+            url = '%s%s' % (BASE_URL, '/'.join(params))
             req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             response = urllib2.urlopen(req)
             image = response.read()
